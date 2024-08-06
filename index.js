@@ -95,6 +95,41 @@ app.post('/create-user', async (req, res) => {
     }
   });
   
+  app.get('/users', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM users');
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error fetching users');
+    }
+});
+
+// Nueva ruta para actualizar el puntaje de un usuario
+app.put('/update-puntaje', async (req, res) => {
+  const { email, puntaje } = req.body;
+
+  if (!email || typeof puntaje !== 'number') {
+      return res.status(400).send('Email and puntaje are required');
+  }
+
+  try {
+      const result = await pool.query(
+          'UPDATE users SET puntaje = puntaje + $1 WHERE email = $2 RETURNING *',
+          [puntaje, email]
+      );
+
+      if (result.rows.length === 0) {
+          return res.status(404).send('User not found');
+      }
+
+      res.status(200).json(result.rows[0]);
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Error updating puntaje');
+  }
+});
+
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
 });
