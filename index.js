@@ -26,7 +26,8 @@ const createTableIfNotExists = async () => {
       id SERIAL PRIMARY KEY,
       name VARCHAR(100) NOT NULL,
       email VARCHAR(100) UNIQUE NOT NULL,
-      puntaje INTEGER DEFAULT 0
+      puntaje INTEGER DEFAULT 0,
+      img VARCHAR(255)
     )
   `;
   try {
@@ -69,7 +70,7 @@ app.post('/chat', async (req, res) => {
 
 // Nueva ruta para crear un usuario
 app.post('/create-user', async (req, res) => {
-    const { name, email } = req.body;
+    const { name, email,img  } = req.body;
   
     if (!name || !email) {
       return res.status(400).send('Name and email are required');
@@ -85,8 +86,8 @@ app.post('/create-user', async (req, res) => {
   
       // Crear el usuario si no existe
       const result = await pool.query(
-        'INSERT INTO users (name, email, puntaje) VALUES ($1, $2, $3) RETURNING *',
-        [name, email, 0]
+        'INSERT INTO users (name, email, puntaje, img) VALUES ($1, $2, $3, $4) RETURNING *',
+        [name, email, 0, img || null]
       );
       res.status(201).json(result.rows[0]);
     } catch (error) {
@@ -130,6 +131,38 @@ app.put('/update-puntaje', async (req, res) => {
   }
 });
 
+app.put('/update-puntaje-restar', async (req, res) => {
+  const { email, puntaje } = req.body;
+
+  if (!email || typeof puntaje !== 'number') {
+      return res.status(400).send('Email and puntaje are required');
+  }
+
+  try {
+      const result = await pool.query(
+          'UPDATE users SET puntaje = puntaje - $1 WHERE email = $2 RETURNING *',
+          [puntaje, email]
+      );
+
+      if (result.rows.length === 0) {
+          return res.status(404).send('User not found');
+      }
+
+      res.status(200).json(result.rows[0]);
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Error updating puntaje');
+  }
+});
+app.delete('/reset-users', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM users');
+    res.status(200).send('All users have been deleted');
+  } catch (error) {
+    console.error('Error deleting users:', error);
+    res.status(500).send('Error deleting users');
+  }
+});
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
 });
