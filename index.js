@@ -164,6 +164,32 @@ app.delete('/reset-users', async (req, res) => {
     res.status(500).send('Error deleting users');
   }
 });
+
+app.put('/update-ejercicios', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).send('Email is required');
+  }
+
+  try {
+    const result = await pool.query(
+      'UPDATE users SET ejercicios_resueltos = ejercicios_resueltos + 1 WHERE email = $1 RETURNING *',
+      [email]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).send('User not found');
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error updating ejercicios_resueltos');
+  }
+});
+
+
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
 });
