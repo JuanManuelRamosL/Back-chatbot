@@ -27,6 +27,7 @@ const createTableIfNotExists = async () => {
       name VARCHAR(100) NOT NULL,
       email VARCHAR(100) UNIQUE NOT NULL,
       puntaje INTEGER DEFAULT 0,
+      ejercicios_resueltos INTEGER DEFAULT 0
       img VARCHAR(255)
     )
   `;
@@ -86,8 +87,8 @@ app.post('/create-user', async (req, res) => {
   
       // Crear el usuario si no existe
       const result = await pool.query(
-        'INSERT INTO users (name, email, puntaje, img) VALUES ($1, $2, $3, $4) RETURNING *',
-        [name, email, 0, img || null]
+        'INSERT INTO users (name, email, puntaje, img, ejercicios_resueltos) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+        [name, email, 0, img || null, 0]
       );
       res.status(201).json(result.rows[0]);
     } catch (error) {
