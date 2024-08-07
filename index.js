@@ -3,7 +3,10 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const morgan = require('morgan');
 const cors = require('cors');
 const { Pool } = require('pg'); 
-const genAI = new GoogleGenerativeAI("AIzaSyDifsYmjh4wVv2EA7W5HFYzC46sc0jCLpI");
+require('dotenv').config();
+const apiKey = process.env.GOOGLE_API_KEY;
+const genAI = new GoogleGenerativeAI(apiKey);
+// const genAI = new GoogleGenerativeAI("AIzaSyDifsYmjh4wVv2EA7W5HFYzC46sc0jCLpI");
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 const app = express();
