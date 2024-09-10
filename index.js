@@ -6,7 +6,6 @@ const { Pool } = require('pg');
 require('dotenv').config();
 const apiKey = process.env.GOOGLE_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
-// const genAI = new GoogleGenerativeAI("AIzaSyDifsYmjh4wVv2EA7W5HFYzC46sc0jCLpI");
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 const app = express();
@@ -19,7 +18,7 @@ app.use(cors({
 app.use(morgan('dev'));
 
 const pool = new Pool({
-    connectionString: "postgres://default:iwcJl2qgrj9W@ep-polished-hat-a4ajebhl.us-east-1.aws.neon.tech:5432/verceldb?sslmode=require"
+    connectionString: process.env.DATABASE_URL
   });
 
   // Crea la tabla si no existe
