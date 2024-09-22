@@ -195,3 +195,5 @@ app.put('/update-ejercicios', async (req, res) => {
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
 });
+
+//npx jsdoc -c jsdoc.json
