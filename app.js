@@ -22,7 +22,7 @@ definition:{
         }
     ]
 },
-apis:[`${path.join(__dirname,"./routes/*.js")}`]
+apis:[`./routes/*.js`]
 }
 
 app.use(express.json());
